@@ -53,7 +53,7 @@ else:
 
 class TwitterPassportMixin(object):
     """
-    Supplies valid credentials to a Passport used in Twitter APi tests.
+    Supplies valid credentials to a Passport used in Twitter API tests.
     """
 
     @staticmethod
