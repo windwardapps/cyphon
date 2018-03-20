@@ -44,12 +44,12 @@ class StreamController(object):
         self.faucet = faucet
         self.query = query
 
-    @cached_property
+    @property
     def stream(self):
         """
-        Checks whether a Stream associated with the StreamController's ApiHandler
-        already exists in the database. If so, returns the Stream object;
-        otherwise, returns a newly created Stream object.
+        Checks whether a Stream associated with the StreamController's
+        ApiHandler already exists in the database. If so, returns the
+        Stream object; otherwise, returns a newly created Stream object.
         """
         return Stream.objects.find_stream(self.faucet)
 
