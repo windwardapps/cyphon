@@ -160,11 +160,11 @@ class SendToChutesTestCase(FaucetTestCase):
         """
         data = [Mock()]
         with patch('sifter.datasifter.datachutes.models.DataChute.bulk_process') \
-                   as mock_process:
+                as mock_process:
             search_count = DataChute.objects.find_enabled()\
-                                      .filter(endpoint=self.search_faucet.endpoint).count()
+                                    .filter(endpoint=self.search_faucet.endpoint).count()
             stream_count = DataChute.objects.find_enabled()\
-                                      .filter(endpoint=self.stream_faucet.endpoint).count()
+                                    .filter(endpoint=self.stream_faucet.endpoint).count()
             self.search_faucet.send_to_chutes(data)
             self.assertEqual(mock_process.call_count, search_count)
 

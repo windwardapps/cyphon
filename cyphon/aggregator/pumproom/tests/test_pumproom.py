@@ -25,7 +25,7 @@ except ImportError:
     from mock import patch
 
 # local
-from aggregator.pumproom.tests.test_pump import PumpBaseTestCase
+from aggregator.pumproom.tests.test_pump import BKGD_SRCH, PumpBaseTestCase
 from aggregator.pumproom.pumproom import PumpRoom
 from aggregator.reservoirs.models import Reservoir
 
@@ -40,7 +40,7 @@ class PumpRoomSingleTestCase(PumpBaseTestCase):
         Tests the get_results method for a Reservoir that doesn't exist.
         """
         reservoirs = Reservoir.objects.filter(name='not_there')
-        pumproom = PumpRoom(reservoirs=reservoirs, task='BKGD_SRCH')
+        pumproom = PumpRoom(reservoirs=reservoirs, task=BKGD_SRCH)
         results = pumproom.get_results(self.query)
         self.assertEqual(results, [])
 
@@ -60,7 +60,6 @@ class PumpRoomMultiTestCase(PumpBaseTestCase):
         mock_results = [1, 2]
         with patch('aggregator.pumproom.pump.Pump.start',
                    side_effect=mock_results):
-            pumproom = PumpRoom(reservoirs=reservoirs, task=self.task1)
+            pumproom = PumpRoom(reservoirs=reservoirs, task=BKGD_SRCH)
             results = pumproom.get_results(self.query)
             self.assertEqual(results, mock_results)
-
