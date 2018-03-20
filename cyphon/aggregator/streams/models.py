@@ -44,10 +44,9 @@ class StreamManager(models.Manager):
         already exists in the database. If so, returns the Stream object;
         otherwise, returns None.
         """
-        try:
-            return self.get(pipe=faucet.endpoint, auth=faucet.passport)
-        except Stream.DoesNotExist:
-            return self.create(pipe=faucet.endpoint, auth=faucet.passport)
+        (stream, dummy_created) = self.get_or_create(pipe=faucet.endpoint,
+                                                     auth=faucet.passport)
+        return stream
 
     def close_all(self):
         """
