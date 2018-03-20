@@ -19,6 +19,7 @@ Defines a StreamController class, which handles queries for streaming APIs.
 """
 
 # standard library
+import logging
 import threading
 
 # third party
@@ -28,6 +29,8 @@ from django.utils.functional import cached_property
 # local
 from aggregator.streams.models import Stream
 from cyphon.transaction import require_lock
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class StreamController(object):
@@ -53,12 +56,17 @@ class StreamController(object):
     def _run_faucet(self):
         """
         Passes the StreamController's query to the Pump's ApiHandler for
-        processing.
-        Updates Stream record as active and saves the current query.
+        processing. Updates Stream record as active and saves the
+        current query.
 
         """
-        # make the API call
-        self.faucet.start(self.query)
+        try:
+            # make the API call
+            self.faucet.start(self.query)
+
+        except Exception as error:
+            _LOGGER.exception('An error occurred in the stream')
+            self.faucet.ensure_cargo()
 
         # update the Invoice
         self.faucet.stop()

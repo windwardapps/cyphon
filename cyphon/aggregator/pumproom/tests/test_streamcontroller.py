@@ -19,6 +19,7 @@ Tests the StreamController class.
 """
 
 # standard library
+from unittest import skipUnless
 try:
     from unittest.mock import Mock, patch
 except ImportError:
@@ -26,13 +27,23 @@ except ImportError:
 
 # third party
 from django.contrib.auth import get_user_model
+from django.test import TestCase, TransactionTestCase
+from testfixtures import LogCapture
 
 # local
 from aggregator.pipes.models import Pipe
 from aggregator.pumproom.faucet import Faucet
 from aggregator.pumproom.streamcontroller import StreamController
-from aggregator.pumproom.tests.test_pump import PumpBaseTestCase
+from aggregator.pumproom.tests.test_pump import BKGD_SRCH, create_pumps
 from aggregator.streams.models import Stream
+from cyphon.transaction import close_old_connections
+from platforms.twitter.handlers import  PublicStreamsAPI
+from platforms.twitter.tests.mixins import (
+    TWITTER_TESTS_ENABLED,
+    TwitterPassportMixin
+)
+from tests.fixture_manager import get_fixtures
+from .test_faucet import FaucetTransactionTestCase
 
 User = get_user_model()
 
@@ -40,33 +51,26 @@ User = get_user_model()
 # allow use of protected members in tests
 
 
-class StreamControllerTestCase(PumpBaseTestCase):
+class StreamControllerTestCase(TestCase):
     """
     Base class for testing the StreamController class.
     """
 
-    @staticmethod
-    def _create_faucet():
-        """
-        Helper method that returns an example ApiHandler.
-        """
-        pipe = Pipe.objects.get_by_natural_key('twitter', 'SearchAPI')
-        user = User.objects.get(pk=1)
-        return Faucet(
-            endpoint=pipe,
-            user=user,
-            task='BKGD_SRCH'
-        )
+    fixtures = get_fixtures(['plumbers', 'gateways', 'funnels',
+                             'pipes', 'streams', 'searchterms'])
 
     def setUp(self):
-        super(StreamControllerTestCase, self).setUp()
-        self.faucet = self._create_faucet()
+        create_pumps(self)
+        pipe = Pipe.objects.get_by_natural_key('twitter', 'SearchAPI')
+        user = User.objects.get(pk=1)
+        self.faucet = Faucet(endpoint=pipe, user=user, task=BKGD_SRCH)
         self.faucet.process_request = Mock()  # avoid NotImplementedError
         self.faucet.stop = Mock()
         self.controller = StreamController(
             faucet=self.faucet,
             query=self.query
         )
+        self.stream = self.controller.stream
 
 
 class GetStreamTestCase(StreamControllerTestCase):
@@ -132,8 +136,11 @@ class QueryIsRunningTestCase(StreamControllerTestCase):
         Tests the _query_is_running method when the stream is running and the
         query is unchanged.
         """
-        self.controller.stream.active = True
-        self.controller.stream.record.query = self.controller.query.to_dict()
+        self.stream = self.controller.stream
+        self.stream.active = True
+        self.stream.save()
+        self.stream.record.query = self.controller.query.to_dict()
+        self.stream.record.save()
         actual = self.controller._query_is_running()
         self.assertIs(actual, True)
 
@@ -142,7 +149,8 @@ class QueryIsRunningTestCase(StreamControllerTestCase):
         Tests the _query_is_running method when the stream is running but the
         query has changed.
         """
-        self.controller.stream.active = True
+        self.stream.active = True
+        self.stream.save()
         actual = self.controller._query_is_running()
         self.assertIs(actual, False)
 
@@ -151,7 +159,8 @@ class QueryIsRunningTestCase(StreamControllerTestCase):
         Tests the _query_is_running method when the query is unchanged but
         the stream is no longer running.
         """
-        self.controller.stream.active = False
+        self.stream.active = False
+        self.stream.save()
         self.controller.query = self.controller.stream.record.query
         actual = self.controller._query_is_running()
         self.assertIs(actual, False)
@@ -161,7 +170,8 @@ class QueryIsRunningTestCase(StreamControllerTestCase):
         Tests the _query_is_running method when the stream is no longer running
         and the query has changed.
         """
-        self.controller.stream.active = False
+        self.stream.active = False
+        self.stream.save()
         self.controller.query = {'new': 'query'}
         actual = self.controller._query_is_running()
         self.assertIs(actual, False)
@@ -196,3 +206,41 @@ class ProcessQueryTestCase(StreamControllerTestCase):
         self.assertIs(actual, True)
         self.assertEqual(self.controller._start_stream.call_count, 1)
 
+
+@skipUnless(TWITTER_TESTS_ENABLED, 'Twitter API tests disabled')
+@close_old_connections
+class StreamingQueryTestCase(FaucetTransactionTestCase, TwitterPassportMixin):
+    """
+    Tests the process_query method of the StreamController class.
+    """
+
+    @patch('platforms.twitter.handlers.tweepy.Stream.filter',
+           side_effect=Exception())
+    @patch('aggregator.pumproom.streamcontroller.Stream.save_as_closed')
+    def test_broken_stream(self, mock_stream_close, mock_stream_run):
+        """
+        Tests that a stream is restarted if an exception is encountered.
+        """
+        self._update_passport()
+        stream_faucet = PublicStreamsAPI(
+            endpoint=self.twitter_stream,
+            user=self.user,
+            task=BKGD_SRCH
+        )
+        stream_controller = StreamController(
+            faucet=stream_faucet,
+            query=self.query
+        )
+
+        self.assertEqual(Stream.objects.count(), 0)
+
+        with LogCapture() as log_capture:
+            stream_controller.process_query()
+
+            self.assertEqual(Stream.objects.count(), 1)
+            mock_stream_close.assert_called_once()
+
+            expected = 'An error occurred in the stream'
+            log_capture.check(
+                ('aggregator.pumproom.streamcontroller', 'ERROR', expected),
+            )
