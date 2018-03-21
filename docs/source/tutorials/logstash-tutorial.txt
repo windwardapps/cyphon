@@ -115,7 +115,7 @@ The first filter will:
 
             # parse the message into individual fields
             grok {
-                 match => { "message" => ["^%{DATA:sys_timestamp}\s+\[\*\*\]\s+\[%{INT:generator_id}:%{INT:signature_id}:%{INT:rid}\]\s+%{DATA:alert}\s\[\*\*\]\s+\[Classification:\s+%{DATA:classification}\]\s+\[Priority:\s+%{INT:priority}\]\s+\{%{DATA:protocol}\}\s+%{IP:source_ip}(:%{INT:source_port})?\s+->\s+%{IP:destination_ip}(:%{INT:destination_port})?"}
+                match => { "message" => "^%{DATA:sys_timestamp}\s+\[\*\*\]\s+\[%{INT:generator_id}:%{INT:signature_id}:%{INT:rid}\]\s+%{DATA:alert}\s\[\*\*\]\s+\[Classification:\s+%{DATA:classification}\]\s+\[Priority:\s+%{INT:priority}\]\s+\{%{DATA:protocol}\}\s+%{IP:source_ip}(:%{INT:source_port})?\s+->\s+%{IP:destination_ip}(:%{INT:destination_port})?" }
             }
 
             # remove the original message if parsing was successful
