@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/). This proj
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+- **cyclops.conf**: updated Cyclops version to `0.5.5`([4d055a6](https://github.com/dunbarcyber/cyphon/commit/91d1829))
 
 <a name="1.6.1"></a>
 ## [1.6.1](https://github.com/dunbarcyber/cyphon/compare/1.6.0...1.6.1) (2018-02-06)
