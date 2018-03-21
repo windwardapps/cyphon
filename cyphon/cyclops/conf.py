@@ -20,7 +20,7 @@ Settings for the Cyclops package.
 
 CYCLOPS_AWS_BUCKET_URL = 'https://s3.amazonaws.com/cyclops-public'
 
-CYCLOPS_VERSION = '0.5.4'
+CYCLOPS_VERSION = '0.5.5'
 """str
 
 Version number of Cyclops to use.
