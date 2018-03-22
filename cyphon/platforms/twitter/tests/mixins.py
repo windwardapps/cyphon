@@ -37,8 +37,8 @@ def _credentials_exist():
     Return a Boolean indicating whether Twitter authentication
     credentials exist.
     """
-    for setting in _TWITTER_SETTINGS:
-        if not _TWITTER_SETTINGS[setting]:
+    for (dummy_key, val) in _TWITTER_SETTINGS.items():
+        if not val:
             return False
     return True
 
