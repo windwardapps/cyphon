@@ -351,9 +351,9 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'formtools': ('http://django-formtools.readthedocs.io/en/latest/', None),
-    'django': ('https://docs.djangoproject.com/en/1.10/',
-               'https://docs.djangoproject.com/en/1.10/_objects/'),
-    'elasticsearch': ('https://elasticsearch-py.readthedocs.io/en/5.0.1/',
+    'django': ('https://docs.djangoproject.com/en/1.11/',
+               'https://docs.djangoproject.com/en/1.11/_objects/'),
+    'elasticsearch': ('https://elasticsearch-py.readthedocs.io/en/5.5.1/',
                       None),
     'mongodb': ('http://api.mongodb.com/python/current/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
