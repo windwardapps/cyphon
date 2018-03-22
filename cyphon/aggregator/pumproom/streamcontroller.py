@@ -65,7 +65,7 @@ class StreamController(object):
             self.faucet.start(self.query)
 
         except Exception as error:
-            _LOGGER.exception('An error occurred in the stream')
+            _LOGGER.exception('An error occurred in the stream: %s', error)
             self.faucet.ensure_cargo()
 
         # update the Invoice
