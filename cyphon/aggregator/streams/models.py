@@ -49,13 +49,20 @@ class StreamManager(models.Manager):
         return stream
 
     def close_all(self):
-        """
+        """Set all |Streams| to inactive.
+
+        Catches and logs any `:class:~OperationalError` raised when
+        attempting to close |Streams|.
+
+        Returns
+        -------
+        None
 
         """
         try:
             self.update(active=False)
         except OperationalError as err:
-            _LOGGER.warning('An error occurred while closing Streams: %s', err)
+            _LOGGER.error('An error occurred while closing Streams: %s', err)
 
 
 class Stream(models.Model):
