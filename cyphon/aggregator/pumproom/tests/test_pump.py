@@ -50,6 +50,21 @@ User = get_user_model()
 # pylint: disable=W0212
 # allow use of protected members in tests
 
+BKGD_SRCH = 'BKGD_SRCH'
+ADHOC_SRCH = 'ADHOC_SRCH'
+FAKE_TASK = 'FAKE_TASK'
+
+
+def create_pumps(obj):
+    """
+
+    """
+    term = SearchTerm.objects.get(pk=1)
+    obj.query = ReservoirQuery(searchterms=[term])
+    reservoir = Reservoir.objects.get(name='twitter')
+    obj.stream_pump = Pump(reservoir=reservoir, task=BKGD_SRCH)
+    obj.nonstream_pump = Pump(reservoir=reservoir, task=ADHOC_SRCH)
+
 
 class PumpBaseTestCase(TestCase):
     """
@@ -59,19 +74,10 @@ class PumpBaseTestCase(TestCase):
                              'pipes', 'streams', 'searchterms'])
 
     def setUp(self):
-        term = SearchTerm.objects.get(pk=1)
-        self.query = ReservoirQuery(searchterms=[term])
         self.subquery1 = Mock()
         self.subquery2 = Mock()
         self.query_list = [self.subquery1, self.subquery2]
-
-        reservoir = Reservoir.objects.get(name='twitter')
-        self.stream_pump = Pump(reservoir=reservoir, task='BKGD_SRCH')
-        self.nonstream_pump = Pump(reservoir=reservoir, task='ADHOC_SRCH')
-
-        self.task1 = 'BKGD_SRCH'
-        self.task2 = 'ADHOC_SRCH'
-        self.task3 = 'FAKE_TASK'
+        create_pumps(self)
 
 
 class PumpTestCase(PumpBaseTestCase):
@@ -115,7 +121,7 @@ class FindPipeTestCase(PumpBaseTestCase):
         Tests the _pipe property for a Pipe doesn't exist.
         """
         reservoir = Reservoir.objects.get(name='twitter')
-        pump = Pump(reservoir=reservoir, task='FAKE_TASK')
+        pump = Pump(reservoir=reservoir, task=FAKE_TASK)
         msg = 'The Reservoir "twitter" has no Pipe for the Task "FAKE_TASK"'
         with six.assertRaisesRegex(self, PipeDoesNotExist, msg):
             pump._pipe
@@ -131,7 +137,7 @@ class FindSpecsheetTestCase(PumpBaseTestCase):
         Tests the _pipe property for a Pipe doesn't exist.
         """
         reservoir = Reservoir.objects.get(name='facebook')
-        pump = Pump(reservoir=reservoir, task='ADHOC_SRCH')
+        pump = Pump(reservoir=reservoir, task=ADHOC_SRCH)
         msg = 'The Pipe "Facebook GraphAPI" has no Specsheet'
         with six.assertRaisesRegex(self, SpecsheetDoesNotExist, msg):
             pump._specsheet
@@ -334,14 +340,7 @@ class StartPumpBaseTestCase(TransactionTestCase):
         self.subquery1 = Mock()
         self.subquery2 = Mock()
         self.query_list = [self.subquery1, self.subquery2]
-
-        reservoir = Reservoir.objects.get(name='twitter')
-        self.stream_pump = Pump(reservoir=reservoir, task='BKGD_SRCH')
-        self.nonstream_pump = Pump(reservoir=reservoir, task='ADHOC_SRCH')
-
-        self.task1 = 'BKGD_SRCH'
-        self.task2 = 'ADHOC_SRCH'
-        self.task3 = 'FAKE_TASK'
+        create_pumps(self)
 
     @close_old_connections
     def test_normal_streaming_query(self):
@@ -387,7 +386,7 @@ class StartPumpBaseTestCase(TransactionTestCase):
 
             # check that a warning was generated
             msg = 'Query was too large for Pipe "Twitter PublicStreamsAPI." ' \
-                        + 'A smaller version of the query was submitted.'
+                  + 'A smaller version of the query was submitted.'
             log_capture.check(
                 ('aggregator.pumproom.pump', 'WARNING', msg),
             )
@@ -409,4 +408,3 @@ class StartPumpBaseTestCase(TransactionTestCase):
         # list returned by _factor_query()
         self.nonstream_pump._process_nonstreaming_queries.assert_called_once_with(
             self.query_list)
-

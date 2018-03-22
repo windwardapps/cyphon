@@ -37,8 +37,8 @@ def _credentials_exist():
     Return a Boolean indicating whether Twitter authentication
     credentials exist.
     """
-    for setting in _TWITTER_SETTINGS:
-        if not _TWITTER_SETTINGS[setting]:
+    for (dummy_key, val) in _TWITTER_SETTINGS.items():
+        if not val:
             return False
     return True
 
@@ -53,7 +53,7 @@ else:
 
 class TwitterPassportMixin(object):
     """
-    Supplies valid credentials to a Passport used in Twitter APi tests.
+    Supplies valid credentials to a Passport used in Twitter API tests.
     """
 
     @staticmethod

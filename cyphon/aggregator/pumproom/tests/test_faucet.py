@@ -20,6 +20,7 @@ Tests the Faucet class.
 
 # standard library
 from unittest import skip
+
 try:
     from unittest.mock import Mock, call, patch
 except ImportError:
@@ -31,9 +32,11 @@ from django.test import TestCase, TransactionTestCase
 from testfixtures import LogCapture
 
 # local
-from aggregator.pumproom.faucet import Faucet
-from aggregator.pipes.models import Pipe
 from aggregator.invoices.models import Invoice
+from aggregator.pipes.models import Pipe
+from aggregator.pumproom.faucet import Faucet
+from aggregator.streams.models import Stream
+from aggregator.pumproom.streamcontroller import StreamController
 from ambassador.stamps.models import Stamp
 from query.reservoirqueries.models import ReservoirQuery
 from sifter.datasifter.datachutes.models import DataChute
@@ -42,76 +45,62 @@ from tests.fixture_manager import get_fixtures
 
 User = get_user_model()
 
+_FIXTURES = get_fixtures(['users', 'datachutes', 'plumbers', 'stamps',
+                          'searchterms'])
+
 # pylint: disable=W0212
 # allow use of protected members in tests
+
+
+def _setup_objects(obj):
+    """
+
+    """
+    obj.user = User.objects.get(pk=1)
+    obj.twitter_search = Pipe.objects.get(pk=1)
+    obj.twitter_stream = Pipe.objects.get(pk=2)
+    obj.instagram = Pipe.objects.get(pk=4)
+
+    obj.search_faucet = Faucet(
+        endpoint=obj.twitter_search,
+        user=obj.user,
+        task='ADHOC_SRCH'
+    )
+
+    obj.stream_faucet = Faucet(
+        endpoint=obj.twitter_stream,
+        user=obj.user,
+        task='BKGD_SRCH'
+    )
+
+    obj.other_faucet = Faucet(
+        endpoint=obj.instagram,
+        user=obj.user,
+        task='OTHER_TASK'
+    )
+    obj.stamp = Stamp.objects.get(pk=1)
+    term = SearchTerm.objects.get(pk=1)
+    obj.query = ReservoirQuery(searchterms=[term])
 
 
 class FaucetTestCase(TestCase):
     """
     Base class for testing the Pump class.
     """
-    fixtures = get_fixtures(['users', 'datachutes', 'stamps', 'searchterms'])
+    fixtures = _FIXTURES
 
     def setUp(self):
-        user = User.objects.get(pk=1)
-        twitter_search = Pipe.objects.get(pk=1)
-        twitter_stream = Pipe.objects.get(pk=2)
-        instagram = Pipe.objects.get(pk=4)
-
-        self.search_faucet = Faucet(
-            endpoint=twitter_search,
-            user=user,
-            task='ADHOC_SRCH'
-        )
-
-        self.stream_faucet = Faucet(
-            endpoint=twitter_stream,
-            user=user,
-            task='BKGD_SRCH'
-        )
-
-        self.other_faucet = Faucet(
-            endpoint=instagram,
-            user=user,
-            task='OTHER_TASK'
-        )
-        self.stamp = Stamp.objects.get(pk=1)
-        term = SearchTerm.objects.get(pk=1)
-        self.query = ReservoirQuery(searchterms=[term])
+        _setup_objects(self)
 
 
 class FaucetTransactionTestCase(TransactionTestCase):
     """
     Base class for testing the Pump class.
     """
-    fixtures = get_fixtures(['users', 'datachutes', 'stamps', 'searchterms'])
+    fixtures = _FIXTURES
 
     def setUp(self):
-        user = User.objects.get(pk=1)
-        twitter_search = Pipe.objects.get(pk=1)
-        twitter_stream = Pipe.objects.get(pk=2)
-        instagram = Pipe.objects.get(pk=4)
-
-        self.search_faucet = Faucet(
-            endpoint=twitter_search,
-            user=user,
-            task='ADHOC_SRCH'
-        )
-
-        self.stream_faucet = Faucet(
-            endpoint=twitter_stream,
-            user=user,
-            task='BKGD_SRCH'
-        )
-
-        self.other_faucet = Faucet(
-            endpoint=instagram,
-            user=user,
-            task='OTHER_TASK'
-        )
-        self.stamp = Stamp.objects.get(pk=1)
-        term = SearchTerm.objects.get(pk=1)
-        self.query = ReservoirQuery(searchterms=[term])
+        _setup_objects(self)
 
 
 class IsObsoleteTestCase(FaucetTransactionTestCase):
@@ -171,11 +160,11 @@ class SendToChutesTestCase(FaucetTestCase):
         """
         data = [Mock()]
         with patch('sifter.datasifter.datachutes.models.DataChute.bulk_process') \
-                   as mock_process:
+                as mock_process:
             search_count = DataChute.objects.find_enabled()\
-                                      .filter(endpoint=self.search_faucet.endpoint).count()
+                                    .filter(endpoint=self.search_faucet.endpoint).count()
             stream_count = DataChute.objects.find_enabled()\
-                                      .filter(endpoint=self.stream_faucet.endpoint).count()
+                                    .filter(endpoint=self.stream_faucet.endpoint).count()
             self.search_faucet.send_to_chutes(data)
             self.assertEqual(mock_process.call_count, search_count)
 
@@ -263,4 +252,3 @@ class ProcessResultsTestCase(FaucetTransactionTestCase):
             log_capture.check(
                 ('aggregator.pumproom.faucet', 'ERROR', msg),
             )
-

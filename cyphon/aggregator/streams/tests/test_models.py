@@ -18,8 +18,16 @@
 Tests the Stream class.
 """
 
+# standard library
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
+
 # third party
+from django.db.utils import OperationalError
 from django.test import TestCase
+from testfixtures import LogCapture
 
 # local
 from aggregator.invoices.models import Invoice
@@ -33,15 +41,29 @@ class StreamManagerTestCase(TestCase):
     """
     fixtures = get_fixtures(['streams'])
 
-    def close_all(self):
+    def test_close_all(self):
         """
-        Tests the __str__ method of the Stream class.
+        Tests the close_all method.
         """
         stream = Stream.objects.get(pk=2)
         assert stream.active
         Stream.objects.close_all()
         stream = Stream.objects.get(pk=2)
         self.assertFalse(stream.active)
+
+    @patch('aggregator.streams.models.Stream.objects.update',
+           side_effect=OperationalError('foobar'))
+    def test_close_all_exception(self, mock_update):
+        """
+        Tests the close_all method when an OperationalError is raised.
+        """
+        with LogCapture() as log_capture:
+            Stream.objects.close_all()
+            log_capture.check(
+                ('aggregator.streams.models',
+                 'ERROR',
+                 'An error occurred while closing Streams: foobar'),
+            )
 
 
 class StreamTestCase(TestCase):
@@ -80,4 +102,3 @@ class StreamTestCase(TestCase):
         stream.save_as_closed()
         saved_stream = Stream.objects.get(auth=2)
         self.assertIs(saved_stream.active, False)
-
