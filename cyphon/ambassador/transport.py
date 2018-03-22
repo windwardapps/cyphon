@@ -227,6 +227,21 @@ class Transport(BaseClass):
         """
         raise self.raise_method_not_implemented()
 
+    def ensure_cargo(self):
+        """Supply the Transport with Cargo if it has none.
+
+        Returns
+        -------
+        self
+
+        """
+        if self.cargo is None:
+            self.cargo = Cargo(
+                notes=('An error occurred while fetching data. '
+                       'Please contact your Site Administrator.')
+            )
+        return self
+
     def process_request(self, obj):
         """Submit a request to the API and return the results.
 

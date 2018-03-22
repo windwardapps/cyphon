@@ -44,19 +44,25 @@ class StreamManager(models.Manager):
         already exists in the database. If so, returns the Stream object;
         otherwise, returns None.
         """
-        try:
-            return self.get(pipe=faucet.endpoint, auth=faucet.passport)
-        except Stream.DoesNotExist:
-            return self.create(pipe=faucet.endpoint, auth=faucet.passport)
+        (stream, dummy_created) = self.get_or_create(pipe=faucet.endpoint,
+                                                     auth=faucet.passport)
+        return stream
 
     def close_all(self):
-        """
+        """Set all |Streams| to inactive.
+
+        Catches and logs any `:class:~OperationalError` raised when
+        attempting to close |Streams|.
+
+        Returns
+        -------
+        None
 
         """
         try:
             self.update(active=False)
         except OperationalError as err:
-            _LOGGER.warning('An error occurred while closing Streams: %s', err)
+            _LOGGER.error('An error occurred while closing Streams: %s', err)
 
 
 class Stream(models.Model):

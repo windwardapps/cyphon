@@ -40,6 +40,7 @@ class TwitterSearchTestCase(ApiHandlerTestCase):
     """
     Tests the SearchAPI class.
     """
+
     @staticmethod
     def _create_search_handler():
         """
