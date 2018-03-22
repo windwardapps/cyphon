@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/). This proj
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+<a name="1.6.2"></a>
+## [1.6.2](https://github.com/dunbarcyber/cyphon/compare/1.6.1...1.6.2) (2018-03-22)
+
+### Added
+
+- **ambassador.transport**: added `Transport.ensure_cargo()` method [a73e0b8](https://github.com/dunbarcyber/cyphon/commit/a73e0b8))
+
+### Fixed
+
+- **aggregator.pumproom.streamcontroller**: prevent exceptions from locking Streams [PR #457](https://github.com/dunbarcyber/cyphon/pull/457) ([0e88556](https://github.com/dunbarcyber/cyphon/commit/0e88556))
+- **sifter.condensers.tests.pages**: fix broken functional tests for offscreen elements [PR #433](https://github.com/dunbarcyber/cyphon/pull/433) ([e2cd38b](https://github.com/dunbarcyber/cyphon/commit/e2cd38b))
+- *target.locations*: remove mixin from LocationManager to fix mocking for Sphinx [PR #396](https://github.com/dunbarcyber/cyphon/pull/396) ([b441361](https://github.com/dunbarcyber/cyphon/commit/b441361))
+- *tox.ini*: add missing Twitter environment variables for tests [c0092f7](https://github.com/dunbarcyber/cyphon/commit/c0092f7))
+
 
 <a name="1.6.1"></a>
 ## [1.6.1](https://github.com/dunbarcyber/cyphon/compare/1.6.0...1.6.1) (2018-02-06)
