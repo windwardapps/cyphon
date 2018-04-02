@@ -69,7 +69,8 @@ HOME_DIR = os.path.dirname(PROJ_DIR)
 KEYS_DIR = os.path.join(HOME_DIR, 'keys')
 
 APPUSERS = {
-    'CUSTOM_FILTER_BACKENDS': []
+    'CUSTOM_FILTER_BACKENDS': [],
+    'ONLY_SHOW_STAFF': False
 }
 
 CODEBOOKS = {

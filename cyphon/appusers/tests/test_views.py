@@ -44,3 +44,15 @@ class AppUserViewTestCase(CyphonAPITestCase):
         count = AppUser.objects.count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), count)
+
+    def test_only_show_staff_setting(self):
+        """
+        Tests that the user list endpoint only shows staff users if the
+        ONLY_SHOW_STAFF setting is set to True.
+        """
+
+        with self.settings(APPUSERS={'ONLY_SHOW_STAFF': True}):
+            response = self.get_api_response(is_staff=False)
+            count = AppUser.objects.filter(is_staff=True).count()
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(response.data['results']), count)
