@@ -38,7 +38,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='cyphon',
-    version='1.6.2',
+    version='1.6.3',
     install_requires=REQUIREMENTS,
     packages=find_packages(),
     include_package_data=True,
