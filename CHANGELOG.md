@@ -4,8 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/). This project adheres to [Semantic Versioning](http://semver.org/).
 
-<a name="Unreleased"></a>
+<a name=""></a>
 ## [Unreleased]
+
+<a name="1.6.4"></a>
+## [1.6.4](https://github.com/dunbarcyber/cyphon/compare/1.6.3...1.6.4) (2018-04-03)
+
+- **cyphon.settings.conf**: added CYCLOPS.API_TIMEOUT to settings file ([249c0ef](https://github.com/dunbarcyber/cyphon/commit/249c0ef))
 
 <a name="1.6.3"></a>
 ## [1.6.3](https://github.com/dunbarcyber/cyphon/compare/1.6.2...1.6.3) (2018-03-30)
