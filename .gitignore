@@ -36,3 +36,4 @@ keys/
 kibana/
 logs/
 media/
+.vscode/
