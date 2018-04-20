@@ -20,7 +20,7 @@
 #
 ############################################################
 
-FROM python:3.6-alpine
+FROM python:3.6.4-alpine
 
 MAINTAINER Leila Hadj-Chikh <leila.hadj-chikh@dunbarsecured.com>
 
@@ -58,9 +58,6 @@ RUN apk add -U --repository http://dl-5.alpinelinux.org/alpine/edge/testing/ \
       jpeg-dev \
       zlib-dev \
       tiff-dev
- # Pip install fails randomly on build with error ImportError: No module named 'pip.download'
- # so upgrade pip
- && pip install --upgrade pip
  && pip install -r $CYPHON_HOME/requirements.txt \
  && apk del build-deps \
  && python -m nltk.downloader -d /usr/local/share/nltk_data punkt wordnet
