@@ -20,7 +20,7 @@
 #
 ############################################################
 
-FROM python:3.6.4-alpine
+FROM python:3.5.4-alpine
 
 MAINTAINER Leila Hadj-Chikh <leila.hadj-chikh@dunbarsecured.com>
 
