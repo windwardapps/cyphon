@@ -17,8 +17,8 @@
 
 """
 import os
-from pip.download import PipSession
-from pip.req import parse_requirements
+from pip._internal.download import PipSession
+from pip._internal.req import parse_requirements
 from setuptools import find_packages, setup
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
