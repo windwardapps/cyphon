@@ -133,6 +133,7 @@ Cyclops is configured with the ``conf.py`` file in the Cyphon settings::
 
     CYCLOPS = {
         'ENABLED': True,
+        'API_TIMEOUT': 30000,
         'MAPBOX_ACCESS_TOKEN': '',
         'DEVELOPMENT_ENABLED': False,
         'DEVELOPMENT_URL': 'http://localhost:8080/',

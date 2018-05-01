@@ -70,6 +70,7 @@ CYCLOPS = {
     'MAPBOX_ACCESS_TOKEN': '',
     'DEVELOPMENT_ENABLED': False,
     'DEVELOPMENT_URL': 'http://localhost:8080/',
+    'API_TIMEOUT': 30000,
 }
 
 DATASIFTER = {

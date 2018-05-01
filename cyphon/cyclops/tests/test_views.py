@@ -130,6 +130,26 @@ class ApplicationTest(CyclopsViewsTestCase):
 
         self.assertEqual(response.context['cyphon_version'], VERSION)
 
+    def test_api_timeout(self):
+        """
+        Tests that the correct api_timeout is passed to the template.
+        """
+        self.authenticate()
+
+        response = self.get_application()
+
+        self.assertEqual(response.context['api_timeout'], 30000)
+        self.assertContains(response, 'API_TIMEOUT: 30000,')
+
+        cyclops_settings = deepcopy(settings.CYCLOPS)
+        cyclops_settings['API_TIMEOUT'] = 60000
+
+        with self.settings(CYCLOPS=cyclops_settings):
+            response = self.get_application()
+
+            self.assertEqual(response.context['api_timeout'], 60000)
+            self.assertContains(response, 'API_TIMEOUT: 60000,')
+
 
 class ManifestTest(CyclopsViewsTestCase):
     """

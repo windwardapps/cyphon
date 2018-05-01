@@ -4,8 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/). This project adheres to [Semantic Versioning](http://semver.org/).
 
-<a name="Unreleased"></a>
+<a name=""></a>
 ## [Unreleased]
+
+<a name="1.6.4"></a>
+## [1.6.4](https://github.com/dunbarcyber/cyphon/compare/1.6.3...1.6.4) (2018-04-03)
+
+### Added
+
+- **cyphon.settings.conf**: added CYCLOPS.API_TIMEOUT to settings file ([249c0ef](https://github.com/dunbarcyber/cyphon/commit/249c0ef))
+
+### Fixed
+
+- **setup.py**: fixed failing CI build due to pip 10 update moving all it's internal API to `._internal` ([92417d1](https://github.com/dunbarcyber/cyphon/commit/92417d1))
 
 <a name="1.6.3"></a>
 ## [1.6.3](https://github.com/dunbarcyber/cyphon/compare/1.6.2...1.6.3) (2018-03-30)
