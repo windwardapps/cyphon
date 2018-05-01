@@ -37,7 +37,7 @@
         API_URL: '/api/v1',
         ADMIN_URL: '/admin/',
         CYPHON_LOGO_URL: '{% static 'images/cyphon-logo.svg' %}',
-        API_TIMEOUT: 30000,
+        API_TIMEOUT: {{ api_timeout }},
         NOTIFICATIONS_SERVICE_WORKER_URL: '/sw.js',
         NOTIFICATIONS_ENABLED: {{ notifications_enabled | lower }},
         MAPBOX_ACCESS_TOKEN: '{{ mapbox_access_token }}',
