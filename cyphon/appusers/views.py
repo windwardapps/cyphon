@@ -51,6 +51,14 @@ class AppUserViewSet(CustomModelViewSet):
         self.custom_filter_backends = _USER_SETTINGS['CUSTOM_FILTER_BACKENDS']
         super(AppUserViewSet, self).__init__(*args, **kwargs)
 
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if settings.APPUSERS.get('ONLY_SHOW_STAFF', False):
+            queryset = queryset.filter(is_staff=True)
+
+        return queryset
+
 
 def jwt_response_payload_handler(token, user=None, request=None):
     return {

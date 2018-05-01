@@ -17,8 +17,8 @@
 
 """
 import os
-from pip.download import PipSession
-from pip.req import parse_requirements
+from pip._internal.download import PipSession
+from pip._internal.req import parse_requirements
 from setuptools import find_packages, setup
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
@@ -38,7 +38,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='cyphon',
-    version='1.6.2',
+    version='1.6.3',
     install_requires=REQUIREMENTS,
     packages=find_packages(),
     include_package_data=True,

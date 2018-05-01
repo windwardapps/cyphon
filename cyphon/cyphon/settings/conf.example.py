@@ -56,7 +56,8 @@ KEYS_DIR = os.path.join(HOME_DIR, 'keys')
 
 
 APPUSERS = {
-    'CUSTOM_FILTER_BACKENDS': []
+    'CUSTOM_FILTER_BACKENDS': [],
+    'ONLY_SHOW_STAFF': False,
 }
 
 CODEBOOKS = {
@@ -69,6 +70,7 @@ CYCLOPS = {
     'MAPBOX_ACCESS_TOKEN': '',
     'DEVELOPMENT_ENABLED': False,
     'DEVELOPMENT_URL': 'http://localhost:8080/',
+    'API_TIMEOUT': 30000,
 }
 
 DATASIFTER = {
