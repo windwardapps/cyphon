@@ -37,7 +37,6 @@ python:
   - "3.6"
 
 install:
-  - pip install --upgrade setuptools
   - pip install tox-travis
 
 before_script:
